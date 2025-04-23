@@ -1,0 +1,159 @@
+To use docker for compiling the OceanWave3D binary on your local machine, do the following steps.
+
+First install Docker desktop, cf. https://docs.docker.com/get-docker/. Run Docker on your local machine.
+
+Make sure to have the following thirdparty library zip/tar files located in the same directory as the Dockerfile
+- Harwell.tar.gz 
+- lapack-3.12.0.tar.gz ( find most recent here: https://www.netlib.org/lapack/ )
+- SPARSKIT2.tar.gz  ( find repos here https://github.com/efocht/SPARSKIT2 )
+
+The Dockerfile is configured to create a linux image, unpack and compile the above libraries, add them to the path, and then compile OceanWwave3D from github withih the container.
+
+>> docker build -t docker_oceanwave3d .
+
+and build with cache clean, e.g. if some code was updated and the image needs to be rebuild, 
+
+>> docker build --no-cache -t docker_oceanwave3d .
+
+then to see the portable container image that is successfully created on your machine to confirm
+
+>> docker images
+
+use the repository name or the image id to run a docker container from the command line. First, copy one of the example files to the directory where you want to run the OceanWave3D binary via the docker container
+
+For example, if you are in the docker/ directory then copy one of the example files (you may modify it if needed)
+>> cp ../examples/inputfiles/OceanWave3D.inp.Whalin OceanWave3D.inp
+
+To make the script an executable you can do this from the command line
+
+>> chmod +x run_oceanwave3d.sh
+
+and then run the OceanWave3D binary via the script
+
+>> ./run_oceanwave3d.sh OceanWave3D.inp
+
+after which you should see output such as 
+
+*********************************************************
+***                                                   ***
+*** OceanWave3D - a coastal engineering tool for      ***
+*** simulation of nonlinear free surface waves.       ***
+*** Copyright (C) 2009 Allan P. Engsig-Karup.         ***
+***                                                   ***
+*** This OceanWave3D program comes with ABSOLUTELY NO ***
+*** WARRANTY. It is distributed under the conditions  ***
+*** of the GNU General Public License version 3.      ***
+***                                                   ***
+***     Software library developed in 2009 by         ***
+***                                                   ***
+***     Allan P. Engsig-Karup                         ***
+***     Guillaume Ducrozet                            ***
+***                                                   ***
+*** At DTU Informatics                                ***
+***    Scientific Computing Section                   ***
+***    Technical University of Denmark                ***
+***                                                   ***
+***     Original software library written in 2007 by  ***
+***                                                   ***
+***     Allan P. Engsig-Karup                         ***
+***     Harry B. Bingham                              ***
+***                                                   ***
+*** At Department of Mechanical Engineering           ***
+***    Coastal, Maritime and Structural Eng. Section  ***
+***    Technical University of Denmark                ***
+***                                                   ***
+*********************************************************
+
+   Input file with model parameters : OceanWave3D.inp                         
+
+   Header title.................... : Whalins experiment (Release Version)                                    
+
+   Bathymetry                         : Predefined (in setup for IC)
+   (Nx,Ny,Nz)=(  257,   17,    6)
+   Size of dx: .1367E+00
+   Size of dy: .1905E+00
+
+   Uneven node-distribution in Z
+   Ghost point layer included below bottom.
+
+   Half-width stencils: (alpha,beta,gamma)=( 3, 3, 3)
+   Half-width stencils: (alpha,beta,gamma)=( 1, 1, 1) (Preconditioner)
+  
+ Starting time for this run is    0.0000000000000000     
+   Number of time steps chosen:     1283
+   Size of time increment: .3900E-01
+    Time-integration method: Classical Runge-Kutta fourth order
+   ** No input value for rho, using 1000.
+    GMRES method is chosen.
+    Strategy: GMRES + MG-RB-F(           1 ,           1 )
+    Tolerance levels user-defined. RelTol =    9.9999999999999995E-007  and AbsTol =    1.0000000000000000E-004
+ 
+ Kinematics output requested in            1  file(s) named "Kinematics_**.bin".
+  
+   Fully nonlinear model is employed.
+
+ No free-surface pressure term is being applied.  
+
+  
+ No breaking model line found, the feature is off.
+  
+     Total relaxation zones defined:            2
+  
+ No Pressure damping line found, the feature is off.
+  
+ Found            0  pressure damping zones.
+   Standard Cartesian model employed.
+
+ do initialization...
+ Relaxation zone setup:
+  Zone  1: idx=(     2,    39,     2,    19)
+  Zone  2: idx=(   222,   258,     2,    19)
+   Relaxation zones have been setup.
+      SF solution: k=   1.6067500854798775      ,h=  0.45720000000000000      ,H=   1.4999999999999999E-002 ,T=   2.0000000000000000      ,L=   2.0000000000000000     
+                   kh=  0.73460613908140004      ,c=   1.0000000000000000     
+ The incident wave is a stream function wave with L=0.391049E+01
+  T=0.200000E+01 H=0.150000E-01 u_E=-.308453E-03 and u_S=0.000000E+00
+
+
+ setup ICs...
+ IC chosen is case            3
+ done with ICs
+   Preconditioning: MG-1F(1,1)
+   WARNING: The number of grids is user-defined to be:            5  grids
+            although algorithm suggest that more levels can be used.
+   Multigrid preproccesing...
+   A total of     5 grids will be used:
+     (Nx,Ny,Nz) = (  257,   17,    6)
+     (Nx,Ny,Nz) = (  129,    9,    6)
+     (Nx,Ny,Nz) = (   65,    5,    6)
+     (Nx,Ny,Nz) = (   33,    5,    6)
+     (Nx,Ny,Nz) = (   17,    5,    6)
+ Building stencils...
+   Preconditioning matrix generated.
+ Building stencils...
+   Preconditioning matrix generated.
+ Building stencils...
+   Preconditioning matrix generated.
+ Building stencils...
+   Preconditioning matrix generated.
+ Building stencils...
+   Preconditioning matrix generated.
+ workspaceSize =        15049
+ Multigrid preprocessing step completed.
+ Determine finite difference stencils for the system matrix...
+ Building stencils...
+ ...done!
+   Starting to time step.
+    ITERATIVE SOLVER WORKSPACE SIZE =       551305
+ A total of        8 GMRES iterations done.
+ A total of        4 GMRES iterations done in first time step.
+ An average of     2.00 GMRES iterations done per solve.
+   Minimum no.        1 and maximum no.        1 iterations per solve
+ A total of       12 GMRES iterations done.
+ A total of        4 GMRES iterations done in first time step.
+ An average of     1.50 GMRES iterations done per solve.
+   Minimum no.        1 and maximum no.        1 iterations per solve
+ An average of     2.00 GMRES iterations done per solve excluding first time step iteration counts.
+   Minimum no.        1 and maximum no.        1 iterations per solve excluding first time step solves
+ A total of       16 GMRES iterations done.
+
