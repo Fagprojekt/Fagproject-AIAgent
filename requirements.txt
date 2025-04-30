@@ -1,0 +1,12 @@
+# ── LangChain ecosystem ───────────────────────────────────────────
+langchain==0.1.14
+langchain-core==0.1.53
+langchain-community==0.0.38     # requires core <0.2
+langchain-openai==0.0.7          # requires core <0.2
+langgraph==0.0.60                # last version on core 0.1
+
+# ── Helper libs ───────────────────────────────────────────────────
+python-dotenv>=1.0
+numpy==1.26.4                    # latest wheel for Python ≤3.11
+matplotlib>=3.8
+pillow                           # GIF writer for the visualiser

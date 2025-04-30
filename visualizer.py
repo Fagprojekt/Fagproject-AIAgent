@@ -12,7 +12,7 @@ import os
 
 # Directory path (ensure this is correct for your system)
 # Placeholder - Update this path
-directory = r"C:/Users/alans/OneDrive - Danmarks Tekniske Universitet/4. Semester/Software Projekt/OceanWave3D-Fortran90-botp/docker/Beach2"
+directory = r"Beach2"
 
 
 # Function to parse a single file with custom scientific notation handler
