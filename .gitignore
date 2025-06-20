@@ -1,0 +1,77 @@
+# Python artefacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Virtual envs
+.env/
+.venv/
+venv/
+env/
+
+# Notebook & editor cruft
+*.ipynb
+.ipynb_checkpoints/
+.vscode/
+.idea/
+.DS_Store
+
+# Simulation data
+data/
+fort.*
+*.gif
+ocean_animation*
+Beach*/fort.*
+
+# Third-party blobs
+vendor/
+*.tar
+*.tar.gz
+*.tgz
+
+# Secrets
+.env
+
+# python artefacts
+__pycache__/
+*.py[cod]
+.venv/
+
+# editors / OS
+.vscode/
+.idea/
+*.swp
+
+# secrets
+.env
+
+# generated data
+output/
+data/
+*.gif
+
+# large archives (we keep them out of git history)
+*.tar.gz
+
+# python artefacts
+__pycache__/
+*.py[cod]
+.venv/
+
+# editors / OS
+.vscode/
+.idea/
+*.swp
+
+# secrets
+.env
+
+# generated
+output/
+data/
+*.gif
+
+# large archives
+*.tar.gz

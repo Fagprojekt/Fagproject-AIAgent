@@ -1,0 +1,293 @@
+<!-- Written by Victor Clausen (s232604) and Asger Lanstorp (s235217)-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ocean AI Agent</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    /* General containers, chats, forms etc. (everything the user sees directly) */
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      height: 100vh;
+      background-color: #f0f2f5;
+    }
+
+    #chat-container {
+      width: 60%;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid #d1d5db;
+      background: #ffffff;
+    }
+    #chat {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+    }
+    #form {
+      display: flex;
+      border-top: 1px solid #d1d5db;
+      padding: 1rem;
+      background: #f9fafb;
+    }
+    #message {
+      flex: 1;
+      padding: .75rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      margin-right: .75rem;
+    }
+    #send {
+      padding: .75rem 1.5rem;
+      font-size: 1rem;
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    #send:disabled {
+      background-color: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .user, .ai, .loading {
+      margin: .5rem 0;
+      padding: .75rem 1.25rem;
+      max-width: 80%;
+      border-radius: 18px;
+      line-height: 1.4;
+    }
+    .user {
+      background: #dbeafe;
+      align-self: flex-end;
+      text-align: right;
+      border-bottom-right-radius: 4px;
+    }
+    .ai {
+      background: #e5e7eb;
+      align-self: flex-start;
+      text-align: left;
+      border-bottom-left-radius: 4px;
+    }
+    .loading {
+      background: #e5e7eb;
+      color: #6b7280;
+      font-style: italic;
+      align-self: flex-start;
+      text-align: left;
+      border-bottom-left-radius: 4px;
+    }
+    
+    /*remove extra whitespace in AI bubbles */
+    .ai > *:first-child { margin-top: 0; }
+    .ai > *:last-child { margin-bottom: 0; }
+    .ai > * { margin-top: 0; margin-bottom: 0.75em; }
+
+
+    /* These next next simply descrive the GIF display */
+    #gif-panel {
+      width: 40%;
+      background: #f9fafb;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    #gif-controls {
+      padding: 1rem;
+      background: #fff;
+      border-bottom: 1px solid #d1d5db;
+      z-index: 10;
+    }
+    #gif-select {
+      width: 100%;
+      padding: .5rem;
+      font-size: .9rem;
+    }
+    #gif-container {
+      flex-grow: 1;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    #gif-container img {
+      width: 100%;
+      height: auto;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      display: block;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    #gif-placeholder {
+      width: 100%;
+      height: 100%;
+      border: 2px dashed #d1d5db;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #9ca3af;
+      font-style: italic;
+      text-align: center;
+      padding: 2rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="chat-container">
+    <div id="chat"></div>
+    <form id="form">
+      <input type="text" id="message" placeholder="e.g., list cases" required autocomplete="off" />
+      <button type="submit" id="send">Send</button>
+    </form>
+  </div>
+
+  <div id="gif-panel">
+    <div id="gif-controls">
+      <select id="gif-select">
+        <option value="">— Select a GIF —</option>
+      </select>
+    </div>
+    <div id="gif-container">
+      <div id="gif-placeholder">Visualizations will appear here</div>
+    </div>
+  </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('form');
+    const messageInput = document.getElementById('message');
+    const sendButton = document.getElementById('send');
+    const chat = document.getElementById('chat');
+    const gifSelect = document.getElementById('gif-select');
+    const gifContainer = document.getElementById('gif-container');
+
+    let chatHistory = [];
+
+    function renderChat() {
+        chat.innerHTML = '';
+        chatHistory.forEach(msg => {
+            const div = document.createElement('div');
+            div.className = msg.role;
+            if (msg.role === 'ai') {
+                div.innerHTML = marked.parse(msg.content);
+            } else {
+                div.textContent = msg.content;
+            }
+            chat.appendChild(div);
+        });
+        chat.scrollTop = chat.scrollHeight;
+    }
+    
+    function setLoadingState(isLoading) {
+        messageInput.disabled = isLoading;
+        sendButton.disabled = isLoading;
+        const loadingBubble = document.querySelector('.loading');
+        if (isLoading && !loadingBubble) {
+            const div = document.createElement('div');
+            div.className = 'loading';
+            div.textContent = 'AI is thinking...';
+            chat.appendChild(div);
+            chat.scrollTop = chat.scrollHeight;
+        } else if (!isLoading && loadingBubble) {
+            loadingBubble.remove();
+        }
+    }
+
+    /** Fetches the list of available GIFs and populates the dropdown. */
+    async function loadGifList() {
+        const prevSelection = gifSelect.value;
+        try {
+            const res = await fetch('/gifs');
+            if (!res.ok) throw new Error('Failed to fetch GIFs');
+            const list = await res.json();
+            gifSelect.innerHTML = '<option value="">— Select a GIF —</option>';
+            list.forEach(name => {
+                const opt = document.createElement('option');
+                opt.value = name;
+                opt.textContent = name;
+                gifSelect.appendChild(opt);
+            });
+            if (list.includes(prevSelection)) {
+                gifSelect.value = prevSelection;
+            }
+        } catch (error) {
+            console.error("Error loading GIF list:", error);
+        }
+    }
+
+    /* Displays a specific GIF in the viewer panel. */
+    function showGif(name) {
+        gifContainer.innerHTML = '';
+        if (name) {
+            const img = document.createElement('img');
+            img.src = `/data/${name}?t=${Date.now()}`;
+            img.alt = `Visualization: ${name}`;
+            gifContainer.appendChild(img);
+            gifSelect.value = name;
+        } else {
+            const placeholder = document.createElement('div');
+            placeholder.id = 'gif-placeholder';
+            placeholder.textContent = 'Visualizations will appear here';
+            gifContainer.appendChild(placeholder);
+        }
+    }
+
+    /* Event Listeners */
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const msgContent = messageInput.value.trim();
+        if (!msgContent) return;
+
+        chatHistory.push({ role: 'user', content: msgContent });
+        renderChat();
+        messageInput.value = '';
+        setLoadingState(true);
+
+        try {
+            const res = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messages: chatHistory })
+            });
+            if (!res.ok) throw new Error(`Server error: ${res.status}`);
+            
+            const data = await res.json();
+            chatHistory = data.messages || [];
+
+            if (data.gif) {
+                await loadGifList();
+                showGif(data.gif.split('/').pop());
+            }
+        } catch (error) {
+            console.error('Chat error:', error);
+            chatHistory.push({ role: 'ai', content: `Sorry, an error occurred: ${error.message}` });
+        } finally {
+            setLoadingState(false);
+            renderChat();
+        }
+    });
+    /* displayment of the gif file. updates every 5 seconds*/
+    gifSelect.addEventListener('change', () => showGif(gifSelect.value));
+    loadGifList();
+    setInterval(loadGifList, 5000);
+});
+</script>
+</body>
+</html>

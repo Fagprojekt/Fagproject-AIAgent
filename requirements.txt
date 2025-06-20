@@ -1,0 +1,16 @@
+# LangChain ecosystem (all on the new 0.2 line)
+langchain==0.2.3
+langchain-core>=0.2,<0.3
+langchain-community==0.2.3
+langchain-openai>=0.1.9          # 0.1.9+ now points to core 0.2+
+langgraph==0.0.69                # needs core >=0.2
+
+python-dotenv>=1.0
+numpy==1.26.4
+matplotlib>=3.8
+pillow>=10.2
+
+
+#UI
+fastapi==0.115.12
+uvicorn==0.34.3
