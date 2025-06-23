@@ -4,8 +4,8 @@
 import sys
 from pathlib import Path
 
-# This file is simply to get the absolute path. The absolute directory is important for a handful of files throughout the program
-# THis file could have possible been "outsourced" to agent.py, but to create simplicity and disassociation, here it is.
+#This file is simply to get the absolute path. The absolute directory is important for a handful of files throughout the program
+#THis file could have possible been "outsourced" to agent.py, but to create simplicity and disassociation, here it is.
 
 def get_app_path(relative_path: str) -> Path:
     try:

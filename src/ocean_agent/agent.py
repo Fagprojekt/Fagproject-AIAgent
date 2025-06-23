@@ -20,10 +20,10 @@ from typing import Optional, Literal, Dict
 from .visualizer import visualize
 from .guardrails import is_reply_off_domain, is_user_reply_off_domain
 from .param_editor import modify_params
-from .path_helper import get_app_path, get_persistent_path, get_project_root_path
+from .path_helper import get_app_path, get_persistent_path, get_project_root_path # <-- Add new function to import
 
 
-# --- Project-level Directory Structure
+# --- Project-level Directory Structure --- (REPLACE your old paths)
 EXAMPLES_DIR = get_app_path("examples")
 OUTPUT_DIR = get_persistent_path("output") # For writable simulation output
 DATA_DIR = get_persistent_path("data")     # For writable GIFs
@@ -42,7 +42,7 @@ def _template_for(case: str) -> Path | None:
 
 # ----------------------------- ALL TOOLS -------------------------------------------
 
-# Definition of the tool that runs the actual oceanWave3d code
+#Definition of the tool that runs the actual oceanWave3d code.Add commentMore actions
 # This tool only needs a valid casename to succesfully run (other than all pre-reqs of course)
 
 class _RunArgs(BaseModel):
@@ -98,7 +98,7 @@ def _viz(case_name: str) -> str:
     except Exception as exc:
         return f"❌ Visualization failed: {exc}"
 
-# Definition of tool that returns the overvies of all available tools for the agent
+# Definition of tool that returns the overvies of all available tools for the agent.
 def _get_agent_capabilities() -> str:
     """Returns a detailed, Markdown-formatted summary of the agent's available tools."""
     markdown_summary = "I have the following capabilities:\n\n"
@@ -149,8 +149,8 @@ def _modify_params(
     if not base_tpl:
         return f"❌ No template 'OceanWave3D.inp.{case_name}' in {EXAMPLES_DIR}"
 
-    #2) if there already exists a _mod, override that, so that users dont end up with multiple "_mod_mod..." files
-    # in case of multible changes
+    #2) if there already exists a _mod, override that, so that users dont end up with multible "_mod_mod..." files
+    #in case of multible changes
     mod_path = EXAMPLES_DIR / f"OceanWave3D.inp.{case_name}_mod"
     tpl = mod_path if mod_path.exists() else base_tpl
 
@@ -241,7 +241,7 @@ def router(state: Dict):
     return "check_output"
 
 
-# Input checker guardrail
+# Input checker guardrail.Add commentMore actions
 # See "is_user_reply_off_domain" definition in guardrails.py
 def input_checker_node(state: Dict) -> Dict:
     """
@@ -259,7 +259,7 @@ def input_checker_node(state: Dict) -> Dict:
             }
     return {"input_decision": "proceed"}
 
-# Output checker guardrail
+# Output checker guardrail.Add commentMore actions
 # See "is_reply_off_domain" definition in guardrails.py
 def output_checker_node(state: Dict) -> Dict:
     """Checks whether the assistant's reply is OFF-DOMAIN."""

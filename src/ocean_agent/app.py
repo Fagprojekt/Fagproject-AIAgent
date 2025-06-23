@@ -18,7 +18,7 @@ from langchain_core.messages import AIMessage, HumanMessage
 from .agent import graph
 from .path_helper import get_app_path, get_persistent_path
 
-# setup for allowed localhost connections
+#setup for allowed localhost connections
 app = FastAPI(title="Ocean AI Agent")
 app.add_middleware(
     CORSMiddleware,
@@ -38,7 +38,7 @@ app.mount("/data", StaticFiles(directory=str(DATA_DIR)), name="data")
 class ChatRequest(BaseModel):
     messages: list[dict]
 
-# HTML setup
+#HTML setup
 @app.get("/", response_class=HTMLResponse)
 async def serve_index():
     """Serves the main frontend application file (index.html)."""
@@ -48,7 +48,7 @@ async def serve_index():
     return HTMLResponse(content=html_path.read_text(encoding="utf-8"))
 
 
-# reciving/outputting chat information
+#reciving/outputting chat information
 @app.post("/chat")
 async def chat_endpoint(req: ChatRequest):
     """
@@ -88,7 +88,7 @@ async def chat_endpoint(req: ChatRequest):
                 gif_path = None
     return JSONResponse({"messages": response_messages, "gif": gif_path})
 
-# Giving the index.html the .gif file from the data folder
+#Giving the index.html the .gif file from the data folder
 @app.get("/gifs")
 async def list_gifs():
     """Provides a list of all available GIF files in the data directory."""
