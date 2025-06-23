@@ -20,10 +20,10 @@ from typing import Optional, Literal, Dict
 from .visualizer import visualize
 from .guardrails import is_reply_off_domain, is_user_reply_off_domain
 from .param_editor import modify_params
-from .path_helper import get_app_path, get_persistent_path, get_project_root_path # <-- Add new function to import
+from .path_helper import get_app_path, get_persistent_path, get_project_root_path
 
 
-# --- Project-level Directory Structure --- (REPLACE your old paths)
+# --- Project-level Directory Structure
 EXAMPLES_DIR = get_app_path("examples")
 OUTPUT_DIR = get_persistent_path("output") # For writable simulation output
 DATA_DIR = get_persistent_path("data")     # For writable GIFs
@@ -42,7 +42,7 @@ def _template_for(case: str) -> Path | None:
 
 # ----------------------------- ALL TOOLS -------------------------------------------
 
-#Definition of the tool that runs the actual oceanWave3d code.Add commentMore actions
+# Definition of the tool that runs the actual oceanWave3d code
 # This tool only needs a valid casename to succesfully run (other than all pre-reqs of course)
 
 class _RunArgs(BaseModel):
@@ -98,7 +98,7 @@ def _viz(case_name: str) -> str:
     except Exception as exc:
         return f"❌ Visualization failed: {exc}"
 
-# Definition of tool that returns the overvies of all available tools for the agent.
+# Definition of tool that returns the overvies of all available tools for the agent
 def _get_agent_capabilities() -> str:
     """Returns a detailed, Markdown-formatted summary of the agent's available tools."""
     markdown_summary = "I have the following capabilities:\n\n"
@@ -149,8 +149,8 @@ def _modify_params(
     if not base_tpl:
         return f"❌ No template 'OceanWave3D.inp.{case_name}' in {EXAMPLES_DIR}"
 
-    #2) if there already exists a _mod, override that, so that users dont end up with multible "_mod_mod..." files
-    #in case of multible changes
+    #2) if there already exists a _mod, override that, so that users dont end up with multiple "_mod_mod..." files
+    # in case of multible changes
     mod_path = EXAMPLES_DIR / f"OceanWave3D.inp.{case_name}_mod"
     tpl = mod_path if mod_path.exists() else base_tpl
 
@@ -235,13 +235,13 @@ def tools_runner(state: Dict) -> Dict:
 # Router is used when the agent needs to call a tool
 def router(state: Dict):
     """Routes the flow. If the AI decided to call a tool, go to the tools_runner.
-    Otherwise, check the AI's text response."""
+    Otherwise, check the AI's text response for stalling."""
     if isinstance(state["messages"][-1], AIMessage) and getattr(state["messages"][-1], "tool_calls", None):
         return "tools"
-    return "check_output"
+    return "check_for_stalling"
 
 
-# Input checker guardrail.Add commentMore actions
+# Input checker guardrail
 # See "is_user_reply_off_domain" definition in guardrails.py
 def input_checker_node(state: Dict) -> Dict:
     """
@@ -259,14 +259,14 @@ def input_checker_node(state: Dict) -> Dict:
             }
     return {"input_decision": "proceed"}
 
-# Output checker guardrail.Add commentMore actions
+# Output checker guardrail
 # See "is_reply_off_domain" definition in guardrails.py
-def output_checker_node(state: Dict) -> Dict:
+def stalling_checker_node(state: Dict) -> Dict:
     """Checks whether the assistant's reply is OFF-DOMAIN."""
     last_reply = state["messages"][-1].content
     if is_reply_off_domain(last_reply):
-        return {"output_decision": "rejection"}
-    return {"output_decision": "end"}
+        return {"stalling_decision": "rejection"}
+    return {"stalling_decision": "end"}
 
 
 # Rejection node
@@ -283,13 +283,13 @@ class AgentState(dict):
     """Defines the state passed between nodes in the graph."""
     messages: list
     input_decision: Literal["rejection","proceed"]
-    output_decision: Literal["rejection", "end"]
+    stalling_decision: Literal["rejection", "end"]
 
 builder = StateGraph(AgentState)
 builder.add_node("input_checker", input_checker_node)
 builder.add_node("assistant", assistant)
 builder.add_node("tools", tools_runner)
-builder.add_node("output_checker", output_checker_node)
+builder.add_node("stalling_checker", stalling_checker_node)
 builder.add_node("rejection", rejection_node)
 
 builder.add_edge(START, "input_checker")
@@ -305,9 +305,9 @@ builder.add_conditional_edges(
 
 builder.add_conditional_edges("assistant", router, {
     "tools":              "tools",
-    "check_output": "output_checker",
+    "check_for_stalling": "stalling_checker",
 })
-builder.add_conditional_edges("output_checker", lambda x: x["output_decision"], {
+builder.add_conditional_edges("stalling_checker", lambda x: x["stalling_decision"], {
     "end":       END,
     "rejection": "rejection",
 })

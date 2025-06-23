@@ -1,4 +1,4 @@
-#[Written by Asger Lanstorp (s235217) and Jens Kalmberg(s235277)]
+# [Written by Asger Lanstorp (s235217) and Jens Kalmberg(s235277)]
 
 # src/ocean_agent/visualizer.py
 """
@@ -48,7 +48,7 @@ def _parse_oceanwave_file(fname: str) -> np.ndarray:
     return np.asarray(rows, dtype=float)
 
 
-#Determines if the plot is 2D or 3D. Used in visualize function
+# Determines if the plot is 2D or 3D. Used in visualize function
 def _detect_grid(first: np.ndarray) -> Tuple[bool, bool, np.ndarray, np.ndarray]:
     """Return is_2d, on_grid, unique_x, unique_y."""
     x, y = first[:, 0], first[:, 1]
@@ -58,13 +58,13 @@ def _detect_grid(first: np.ndarray) -> Tuple[bool, bool, np.ndarray, np.ndarray]
     return is_2d, on_grid, ux, uy
 
 
-#Generates a 2D or 3D animated visualization of OceanWave3D output and saves it as a GIF.
+# Generates a 2D or 3D animated visualization of OceanWave3D output and saves it as a GIF.
 
-#Args:
-#data_dir: Directory containing fort.* files.
-#output_gif: Path to save the resulting .gif.
-#fps: hardcoded to 5. Tried a few different ones, but 5 felt the most natural
-#Returns the path to the saved .gif file.
+# Args:
+# data_dir: Directory containing fort.* files.
+# output_gif: Path to save the resulting .gif.
+# fps: hardcoded to 5. Tried a few different ones, but 5 felt the most natural
+# Returns the path to the saved .gif file.
 def visualize(data_dir: str | Path,
               output_gif: str | Path,
               fps: int = 5) -> Path:
@@ -109,7 +109,7 @@ def visualize(data_dir: str | Path,
         ax.set_xlabel("X"); ax.set_ylabel("Y"); ax.set_zlabel("η")
         ax.set_zlim(*z_lim)
 
-#Update the frames based of the framerate
+# Update the frames based of the framerate
     def _update(i: int):
         data = _parse_oceanwave_file(files[i])
         if data.size == 0:

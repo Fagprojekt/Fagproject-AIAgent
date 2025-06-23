@@ -40,7 +40,7 @@ def is_reply_off_domain(reply: str) -> bool:
 
     return "true" in judgment.lower()
 
-#Be aware that even small word changes can cause massive destruction
+# Be aware that even small word changes can cause massive destruction
 DOMAIN_CHECK_PROMPT = ChatPromptTemplate.from_messages([
     (
         "system",
@@ -87,8 +87,8 @@ def is_user_reply_off_domain(reply: str) -> bool:
 
     return "true" in judgment.lower()
 
-#Message that is written directly to the LLM guardrail.
-#Be aware that even small word changes can cause massive destruction
+# Message that is written directly to the LLM guardrail.
+# Be aware that even small word changes can cause massive destruction
 DOMAIN_CHECK_PROMPT_prompt = ChatPromptTemplate.from_messages([
     (
         "system",
