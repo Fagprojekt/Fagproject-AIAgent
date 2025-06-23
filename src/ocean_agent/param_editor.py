@@ -1,4 +1,4 @@
-#[Written by Emil Skovgård (s235282) and Victor Clausen (s232604)]
+# [Written by Emil Skovgård (s235282) and Victor Clausen (s232604)]
 
 from pathlib import Path
 from typing import Dict
@@ -40,7 +40,7 @@ def modify_params(
     applied_changes = []
 
     # hardcoding the the line indexes for nsteps and gravity.
-    #Could possibly have been dynamic, which cool be cool if we wished to do this for more conditions
+    # Could possibly have been dynamic, which cool be cool if we wished to do this for more conditions
     param_line_map = {
         'nsteps': 4,   # line index 4 (5th line)
         'gravity': 5,   # line index 5 (6th line)
@@ -68,7 +68,7 @@ def modify_params(
             values[0] = str(new_value)
 
         # Preserve comment if present
-        #Here because the agent should never change anything after "<-" in the .inp files
+        # Here because the agent should never change anything after "<-" in the .inp files
         comment_start = line.find('<-')
         data_part = ' '.join(values)
         if comment_start != -1:
