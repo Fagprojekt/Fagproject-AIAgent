@@ -235,10 +235,10 @@ def tools_runner(state: Dict) -> Dict:
 # Router is used when the agent needs to call a tool
 def router(state: Dict):
     """Routes the flow. If the AI decided to call a tool, go to the tools_runner.
-    Otherwise, check the AI's text response for stalling."""
+    Otherwise, check the AI's text response."""
     if isinstance(state["messages"][-1], AIMessage) and getattr(state["messages"][-1], "tool_calls", None):
         return "tools"
-    return "check_for_stalling"
+    return "check_output"
 
 
 # Input checker guardrail
@@ -283,7 +283,7 @@ class AgentState(dict):
     """Defines the state passed between nodes in the graph."""
     messages: list
     input_decision: Literal["rejection","proceed"]
-    stalling_decision: Literal["rejection", "end"]
+    output_decision: Literal["rejection", "end"]
 
 builder = StateGraph(AgentState)
 builder.add_node("input_checker", input_checker_node)
