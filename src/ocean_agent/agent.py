@@ -261,12 +261,12 @@ def input_checker_node(state: Dict) -> Dict:
 
 # Output checker guardrail
 # See "is_reply_off_domain" definition in guardrails.py
-def stalling_checker_node(state: Dict) -> Dict:
+def output_checker_node(state: Dict) -> Dict:
     """Checks whether the assistant's reply is OFF-DOMAIN."""
     last_reply = state["messages"][-1].content
     if is_reply_off_domain(last_reply):
-        return {"stalling_decision": "rejection"}
-    return {"stalling_decision": "end"}
+        return {"output_decision": "rejection"}
+    return {"output_decision": "end"}
 
 
 # Rejection node
@@ -289,7 +289,7 @@ builder = StateGraph(AgentState)
 builder.add_node("input_checker", input_checker_node)
 builder.add_node("assistant", assistant)
 builder.add_node("tools", tools_runner)
-builder.add_node("stalling_checker", stalling_checker_node)
+builder.add_node("output_checker", output_checker_node)
 builder.add_node("rejection", rejection_node)
 
 builder.add_edge(START, "input_checker")
@@ -305,9 +305,9 @@ builder.add_conditional_edges(
 
 builder.add_conditional_edges("assistant", router, {
     "tools":              "tools",
-    "check_for_stalling": "stalling_checker",
+    "check_output": "output_checker",
 })
-builder.add_conditional_edges("stalling_checker", lambda x: x["stalling_decision"], {
+builder.add_conditional_edges("output_checker", lambda x: x["output_decision"], {
     "end":       END,
     "rejection": "rejection",
 })
